@@ -20,58 +20,60 @@ Copy the “DetourXS” folder into your source folder and include, #include “
 Example
 -------
 
-	#include <Windows.h>
-	#include <iostream>
-	#include "DetourXS/detourxs.h"
+```cpp
+#include <Windows.h>
+#include <iostream>
+#include "DetourXS/detourxs.h"
 
-	typedef DWORD (WINAPI* tGetTickCount)();
-	tGetTickCount GetTickCountOrigFirst = NULL;
-	tGetTickCount GetTickCountOrigSecond = NULL;
-	tGetTickCount GetTickCountOrigThird = NULL;
+typedef DWORD (WINAPI* tGetTickCount)();
+tGetTickCount GetTickCountOrigFirst = NULL;
+tGetTickCount GetTickCountOrigSecond = NULL;
+tGetTickCount GetTickCountOrigThird = NULL;
 
-	DWORD WINAPI GetTickCountHookFirst()
-	{
-		std::cout << "GetTickCount FIRST HOOK called\n";
-		return GetTickCountOrigFirst();
-	}
+DWORD WINAPI GetTickCountHookFirst()
+{
+  std::cout << "GetTickCount FIRST HOOK called\n";
+  return GetTickCountOrigFirst();
+}
 
-	DWORD WINAPI GetTickCountHookSecond()
-	{
-		std::cout << "GetTickCount SECOND HOOK called\n";
-		return GetTickCountOrigSecond();
-	}
+DWORD WINAPI GetTickCountHookSecond()
+{
+  std::cout << "GetTickCount SECOND HOOK called\n";
+  return GetTickCountOrigSecond();
+}
 
-	DWORD WINAPI GetTickCountHookThird()
-	{
-		std::cout << "GetTickCount THIRD HOOK called\n";
-		return GetTickCountOrigThird();
-	}
+DWORD WINAPI GetTickCountHookThird()
+{
+  std::cout << "GetTickCount THIRD HOOK called\n";
+  return GetTickCountOrigThird();
+}
 
 
-	int main()
-	{
-		DetourXS gtcFirst(&GetTickCount, GetTickCountHookFirst);
-		GetTickCountOrigFirst = (tGetTickCount) gtcFirst.GetTrampoline();
+int main()
+{
+  DetourXS gtcFirst(&GetTickCount, GetTickCountHookFirst);
+  GetTickCountOrigFirst = (tGetTickCount) gtcFirst.GetTrampoline();
 
-		DetourXS gtcSecond(&GetTickCount, GetTickCountHookSecond);
-		GetTickCountOrigSecond = (tGetTickCount) gtcSecond.GetTrampoline();
+  DetourXS gtcSecond(&GetTickCount, GetTickCountHookSecond);
+  GetTickCountOrigSecond = (tGetTickCount) gtcSecond.GetTrampoline();
 
-		DetourXS gtcThird(&GetTickCount, GetTickCountHookThird);
-		GetTickCountOrigThird = (tGetTickCount) gtcThird.GetTrampoline();
+  DetourXS gtcThird(&GetTickCount, GetTickCountHookThird);
+  GetTickCountOrigThird = (tGetTickCount) gtcThird.GetTrampoline();
 
-		std::cout << "Calling GetTickCount\n";
-		GetTickCount();
+  std::cout << "Calling GetTickCount\n";
+  GetTickCount();
 
-		// Presently in order to not break the chain you can only remove the detours in this order
-		// - It won't crash if you don't but you will break the chain
-		gtcThird.Destroy();
-		gtcSecond.Destroy();
+  // Presently in order to not break the chain you can only remove the detours in this order
+  // - It won't crash if you don't but you will break the chain
+  gtcThird.Destroy();
+  gtcSecond.Destroy();
 
-		std::cout << "Calling GetTickCount\n";
-		GetTickCount();
+  std::cout << "Calling GetTickCount\n";
+  GetTickCount();
 
-		return 0;
-	}
+  return 0;
+}
+```
 
 Limitations
 -----------
